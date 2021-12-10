@@ -14,19 +14,45 @@ filetype indent on      " load filetype-specific indent files
 
 inoremap jk <esc>
 
+nnoremap <A-Up> :m-2<CR>
+nnoremap <A-Down> :m+<CR>
+inoremap <A-Up> <Esc>:m-2<CR>
+inoremap <A-Down> <Esc>:m+<CR>
 
 call plug#begin('~/.vim/plugged')
 
+Plug 'mattn/emmet-vim'
+Plug 'rafi/vim-venom', { 'for': 'python' }
+Plug 'dyng/ctrlsf.vim'
 Plug 'Glench/Vim-Jinja2-Syntax'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
 Plug 'neovim/nvim-lspconfig'
+Plug 'kabouzeid/nvim-lspinstall'
 Plug 'hrsh7th/nvim-cmp'
 Plug 'hrsh7th/cmp-nvim-lsp'
 Plug 'saadparwaiz1/cmp_luasnip'
 Plug 'L3MON4D3/LuaSnip'
-
+Plug 'leafOfTree/vim-svelte-plugin'
 Plug 'nvim-lua/popup.nvim'
+Plug 'mfussenegger/nvim-lint'
+
+"Plug 'petobens/poet-v'
+
+Plug 'prabirshrestha/vim-lsp'
+Plug 'mattn/vim-lsp-settings'
+
+Plug 'SirVer/ultisnips'
+Plug 'prabirshrestha/async.vim'
+Plug 'prabirshrestha/vim-lsp'
+Plug 'thomasfaingnaert/vim-lsp-snippets'
+Plug 'thomasfaingnaert/vim-lsp-ultisnips'
+
+Plug 'hrsh7th/vim-vsnip'
+Plug 'hrsh7th/vim-vsnip-integ',
+
+"Plug 'tribela/vim-transparent'
+Plug 'norcalli/snippets.nvim'
 
 Plug 'hoob3rt/lualine.nvim'
 Plug 'kyazdani42/nvim-web-devicons'
@@ -45,13 +71,47 @@ Plug 'morhetz/gruvbox'  " colorscheme gruvbox
 " Plug 'mhartington/oceanic-next'  " colorscheme OceanicNext
 " Plug 'kaicataldo/material.vim', { 'branch': 'main' }
 " Plug 'ayu-theme/ayu-vim'
+" Use release branch (recommend)
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+"
+" " Or build from source code by using yarn: https://yarnpkg.com
+" Plug 'neoclide/coc.nvim', {'branch': 'master', 'do': 'yarn install
+" --frozen-lockfile'}
+
+
+Plug 'neovim/nvim-lspconfig'
+Plug 'hrsh7th/cmp-nvim-lsp'
+Plug 'hrsh7th/cmp-buffer'
+Plug 'hrsh7th/cmp-path'
+Plug 'hrsh7th/cmp-cmdline'
+Plug 'hrsh7th/nvim-cmp'
+
+" For vsnip users.
+Plug 'hrsh7th/cmp-vsnip'
+Plug 'hrsh7th/vim-vsnip'
+
+" For luasnip users.
+" Plug 'L3MON4D3/LuaSnip'
+" Plug 'saadparwaiz1/cmp_luasnip'
+
+" For ultisnips users.
+" Plug 'SirVer/ultisnips'
+" Plug 'quangnguyen30192/cmp-nvim-ultisnips'
+
+" For snippy users.
+" Plug 'dcampos/nvim-snippy'
+" Plug 'dcampos/cmp-snippy'
 
 call plug#end()
 
-nnoremap <silent> ;f <cmd>Telescope find_files<cr>
+let g:user_emmet_leader_key='<C-y>'
+
+nnoremap <leader>sv :source $MYVIMRC<CR>
+
+nnoremap <silent> ;; <cmd>Telescope find_files<cr>
 nnoremap <silent> ;r <cmd>Telescope live_grep<cr>
 nnoremap <silent> \\ <cmd>Telescope buffers<cr>
-nnoremap <silent> ;; <cmd>Telescope help_tags<cr>
+nnoremap <silent> ;f <cmd>Telescope help_tags<cr>
 
 if (has('termguicolors'))
   set termguicolors
@@ -66,6 +126,12 @@ set completeopt=menuone,noinsert,noselect
 inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
+nmap     <C-F>f <Plug>CtrlSFPrompt
+nmap     <C-F>n <Plug>CtrlSFCwordPath
+nmap     <C-F>p <Plug>CtrlSFPwordPath
+
+let g:ctrlsf_backend = "rg"
+let g:python3_host_prog = "/usr/local/opt/python@3.9/bin/python3"
 let g:nvim_tree_gitignore = 1 "0 by default
 let g:nvim_tree_quit_on_open = 1 "0 by default, closes the tree when you open a file
 let g:nvim_tree_indent_markers = 1 "0 by default, this option shows indent markers when folders are open
@@ -106,6 +172,12 @@ let g:nvim_tree_show_icons = {
 "if folder is 1, you can also tell folder_arrows 1 to show small arrows next to the folder icons.
 "but this will not work when you set indent_markers (because of UI conflict)
 
+let g:venom_use_tools = 1
+let g:venom_tools = {
+  \ 'poetry': 'poetry env info -p',
+  \ 'pipenv': 'pipenv --venv'
+  \ }
+
 " default will show icon by default if no icon is provided
 " default shows no icon by default
 let g:nvim_tree_icons = {
@@ -140,9 +212,20 @@ nnoremap <leader>n :NvimTreeFindFile<CR>
 set termguicolors " this variable must be enabled for colors to be applied properly
 
 " a list of groups can be found at `:help nvim_tree_highlight`
-highlight NvimTreeFolderIcon guibg=grey
 
+
+highlight NvimTreeFolderIcon guibg=grey
 lua << EOF
+
+require'lspinstall'.setup() -- important
+
+local servers = require'lspinstall'.installed_servers()
+for _, server in pairs(servers) do
+  require'lspconfig'[server].setup{}
+end
+
+require'snippets'.use_suggested_mappings()
+
 -- following options are the default
 -- each of these are documented in `:help nvim-tree.OPTION_NAME`
 require'nvim-tree'.setup {
@@ -240,7 +323,7 @@ cmp.setup {
       else
         fallback()
       end
-    end,
+  end,
     ['<S-Tab>'] = function(fallback)
       if vim.fn.pumvisible() == 1 then
         vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<C-p>', true, true, true), 'n')
@@ -256,7 +339,26 @@ cmp.setup {
     { name = 'luasnip' },
   },
 }
+
 EOF
+
+" Use <C-l> for trigger snippet expand.
+imap <C-l> <Plug>(coc-snippets-expand)
+
+" Use <C-j> for select text for visual placeholder of snippet.
+vmap <C-j> <Plug>(coc-snippets-select)
+
+" Use <C-j> for jump to next placeholder, it's default of coc.nvim
+let g:coc_snippet_next = '<c-j>'
+
+" Use <C-k> for jump to previous placeholder, it's default of coc.nvim
+let g:coc_snippet_prev = '<c-k>'
+
+" Use <C-j> for both expand and jump (make expand higher priority.)
+imap <C-j> <Plug>(coc-snippets-expand-jump)
+
+" Use <leader>x for convert visual selected code to snippet
+xmap <leader>x  <Plug>(coc-convert-snippet)
 
 lua << EOF
 local nvim_lsp = require('lspconfig')
@@ -293,6 +395,28 @@ local on_attach = function(client, bufnr)
   buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
   buf_set_keymap('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
 end
+
+require'lspconfig'.svelte.setup{}
+
+local lspconfig = require'lspconfig'
+local configs = require'lspconfig/configs'
+
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities.textDocument.completion.completionItem.snippetSupport = true
+
+if not lspconfig.emmet_ls then
+  configs.emmet_ls = {
+    default_config = {
+      cmd = {'emmet-ls', '--stdio'};
+      filetypes = {'html', 'css', 'blade'};
+      root_dir = function(fname)
+        return vim.loop.cwd()
+      end;
+      settings = {};
+    };
+  }
+end
+lspconfig.emmet_ls.setup{ capabilities = capabilities; }
 
 require'nvim-web-devicons'.setup {
  -- your personnal icons can go here (to override)
@@ -405,3 +529,125 @@ set colorcolumn=120
 " run current script with python3 by CTRL+R in command and insert mode
 autocmd FileType python map <buffer> <C-r> :w<CR>:exec '!python3' shellescape(@%, 1)<CR>
 autocmd FileType python imap <buffer> <C-r> <esc>:w<CR>:exec '!python3' shellescape(@%, 1)<CR>
+
+autocmd BufEnter * lua require'completion'.on_attach()
+
+let g:completion_enable_snippet = 'vim-vsnip'
+let g:completion_trigger_character = ['.']
+
+" NOTE: You can use other key to expand snippet.
+
+" Expand
+imap <expr> <C-j>   vsnip#expandable()  ? '<Plug>(vsnip-expand)'         : '<C-j>'
+smap <expr> <C-j>   vsnip#expandable()  ? '<Plug>(vsnip-expand)'         : '<C-j>'
+
+" Expand or jump
+imap <expr> <C-l>   vsnip#available(1)  ? '<Plug>(vsnip-expand-or-jump)' : '<C-l>'
+smap <expr> <C-l>   vsnip#available(1)  ? '<Plug>(vsnip-expand-or-jump)' : '<C-l>'
+
+" Jump forward or backward
+imap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
+smap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
+imap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
+smap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
+
+" Select or cut text to use as $TM_SELECTED_TEXT in the next snippet.
+" See https://github.com/hrsh7th/vim-vsnip/pull/50
+nmap        s   <Plug>(vsnip-select-text)
+xmap        s   <Plug>(vsnip-select-text)
+nmap        S   <Plug>(vsnip-cut-text)
+xmap        S   <Plug>(vsnip-cut-text)
+
+" If you want to use snippet for multiple filetypes, you can `g:vsnip_filetypes` for it.
+let g:vsnip_filetypes = {}
+let g:vsnip_filetypes.javascriptreact = ['javascript']
+let g:vsnip_filetypes.typescriptreact = ['typescript']
+let g:vsnip_filetypes.pythonreact = ['python']
+
+" let g:UltiSnipsExpandTrigger="<tab>"
+" let g:UltiSnipsJumpForwardTrigger="<tab>"
+" let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+
+if executable('clangd')
+    augroup vim_lsp_cpp
+        autocmd!
+        autocmd User lsp_setup call lsp#register_server({
+                    \ 'name': 'clangd',
+                    \ 'cmd': {server_info->['clangd']},
+                    \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
+                    \ })
+	autocmd FileType c,cpp,objc,objcpp,cc setlocal omnifunc=lsp#complete
+    augroup end
+endif
+
+set clipboard+=unnamedplus
+set completeopt=menu,menuone,noselect
+set completeopt+=menuone
+
+lua <<EOF
+  -- Setup nvim-cmp.
+  local cmp = require'cmp'
+
+  cmp.setup({
+    snippet = {
+      -- REQUIRED - you must specify a snippet engine
+      expand = function(args)
+        vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+        -- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+        -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
+        -- require'snippy'.expand_snippet(args.body) -- For `snippy` users.
+      end,
+    },
+    mapping = {
+      ['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
+      ['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
+      ['<C-Space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
+      ['<C-y>'] = cmp.config.disable, -- Specify `cmp.config.disable` if you want to remove the default `<C-y>` mapping.
+      ['<C-e>'] = cmp.mapping({
+        i = cmp.mapping.abort(),
+        c = cmp.mapping.close(),
+      }),
+      -- Accept currently selected item. If none selected, `select` first item.
+      -- Set `select` to `false` to only confirm explicitly selected items.
+      ['<CR>'] = cmp.mapping.confirm({ select = true }),
+    },
+    sources = cmp.config.sources({
+      { name = 'nvim_lsp' },
+      { name = 'vsnip' }, -- For vsnip users.
+      -- { name = 'luasnip' }, -- For luasnip users.
+      -- { name = 'ultisnips' }, -- For ultisnips users.
+      -- { name = 'snippy' }, -- For snippy users.
+    }, {
+      { name = 'buffer' },
+    })
+  })
+
+  -- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
+  cmp.setup.cmdline('/', {
+    sources = {
+      { name = 'buffer' }
+    }
+  })
+
+  -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+  cmp.setup.cmdline(':', {
+    sources = cmp.config.sources({
+      { name = 'path' }
+    }, {
+      { name = 'cmdline' }
+    })
+  })
+
+  -- Setup lspconfig.
+  local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+  -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
+  require'lspinstall'.setup() -- important
+
+  local servers = require'lspinstall'.installed_servers()
+  for _, server in pairs(servers) do
+      require('lspconfig')[server].setup {
+        capabilities = capabilities
+      }
+  end
+EOF
+
