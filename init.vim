@@ -37,21 +37,8 @@ Plug 'leafOfTree/vim-svelte-plugin'
 Plug 'nvim-lua/popup.nvim'
 Plug 'mfussenegger/nvim-lint'
 
-"Plug 'petobens/poet-v'
+" Plug 'petobens/poet-v'
 
-Plug 'prabirshrestha/vim-lsp'
-Plug 'mattn/vim-lsp-settings'
-
-Plug 'SirVer/ultisnips'
-Plug 'prabirshrestha/async.vim'
-Plug 'prabirshrestha/vim-lsp'
-Plug 'thomasfaingnaert/vim-lsp-snippets'
-Plug 'thomasfaingnaert/vim-lsp-ultisnips'
-
-Plug 'hrsh7th/vim-vsnip'
-Plug 'hrsh7th/vim-vsnip-integ',
-
-"Plug 'tribela/vim-transparent'
 Plug 'norcalli/snippets.nvim'
 
 Plug 'hoob3rt/lualine.nvim'
@@ -78,7 +65,6 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 " Plug 'neoclide/coc.nvim', {'branch': 'master', 'do': 'yarn install
 " --frozen-lockfile'}
 
-
 Plug 'neovim/nvim-lspconfig'
 Plug 'hrsh7th/cmp-nvim-lsp'
 Plug 'hrsh7th/cmp-buffer'
@@ -89,18 +75,6 @@ Plug 'hrsh7th/nvim-cmp'
 " For vsnip users.
 Plug 'hrsh7th/cmp-vsnip'
 Plug 'hrsh7th/vim-vsnip'
-
-" For luasnip users.
-" Plug 'L3MON4D3/LuaSnip'
-" Plug 'saadparwaiz1/cmp_luasnip'
-
-" For ultisnips users.
-" Plug 'SirVer/ultisnips'
-" Plug 'quangnguyen30192/cmp-nvim-ultisnips'
-
-" For snippy users.
-" Plug 'dcampos/nvim-snippy'
-" Plug 'dcampos/cmp-snippy'
 
 call plug#end()
 
@@ -126,12 +100,12 @@ set completeopt=menuone,noinsert,noselect
 inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
-nmap     <C-F>f <Plug>CtrlSFPrompt
+nmap     <C-F>f <Plug>CtrlSFPrompt                  
 nmap     <C-F>n <Plug>CtrlSFCwordPath
 nmap     <C-F>p <Plug>CtrlSFPwordPath
 
 let g:ctrlsf_backend = "rg"
-let g:python3_host_prog = "/usr/local/opt/python@3.9/bin/python3"
+let g:python3_host_prog = "/usr/local/bin/python3.9"
 let g:nvim_tree_gitignore = 1 "0 by default
 let g:nvim_tree_quit_on_open = 1 "0 by default, closes the tree when you open a file
 let g:nvim_tree_indent_markers = 1 "0 by default, this option shows indent markers when folders are open
@@ -216,12 +190,20 @@ set termguicolors " this variable must be enabled for colors to be applied prope
 
 highlight NvimTreeFolderIcon guibg=grey
 lua << EOF
+require('lint').linters_by_ft = {
+  markdown = {'flake8',}
+}
 
 require'lspinstall'.setup() -- important
 
 local servers = require'lspinstall'.installed_servers()
 for _, server in pairs(servers) do
-  require'lspconfig'[server].setup{}
+    require'lspconfig'[server].setup{
+      on_attach = on_attach,
+--      init_options = {
+--        lint = true,
+--      }
+    }
 end
 
 require'snippets'.use_suggested_mappings()
@@ -399,23 +381,24 @@ end
 require'lspconfig'.svelte.setup{}
 
 local lspconfig = require'lspconfig'
-local configs = require'lspconfig/configs'
+local configs = require'lspconfig/configs'    
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
-if not lspconfig.emmet_ls then
-  configs.emmet_ls = {
-    default_config = {
+if not lspconfig.emmet_ls then    
+  configs.emmet_ls = {    
+    default_config = {    
       cmd = {'emmet-ls', '--stdio'};
       filetypes = {'html', 'css', 'blade'};
-      root_dir = function(fname)
+      root_dir = function(fname)    
         return vim.loop.cwd()
-      end;
-      settings = {};
-    };
-  }
-end
+      end;    
+      settings = {};    
+    };    
+  }    
+end    
+
 lspconfig.emmet_ls.setup{ capabilities = capabilities; }
 
 require'nvim-web-devicons'.setup {
@@ -546,10 +529,10 @@ imap <expr> <C-l>   vsnip#available(1)  ? '<Plug>(vsnip-expand-or-jump)' : '<C-l
 smap <expr> <C-l>   vsnip#available(1)  ? '<Plug>(vsnip-expand-or-jump)' : '<C-l>'
 
 " Jump forward or backward
-imap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
-smap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
-imap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
-smap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
+" imap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
+" smap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
+" imap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
+" smap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
 
 " Select or cut text to use as $TM_SELECTED_TEXT in the next snippet.
 " See https://github.com/hrsh7th/vim-vsnip/pull/50
@@ -564,9 +547,7 @@ let g:vsnip_filetypes.javascriptreact = ['javascript']
 let g:vsnip_filetypes.typescriptreact = ['typescript']
 let g:vsnip_filetypes.pythonreact = ['python']
 
-" let g:UltiSnipsExpandTrigger="<tab>"
-" let g:UltiSnipsJumpForwardTrigger="<tab>"
-" let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+au BufWritePost <buffer> lua require('lint').try_lint()
 
 if executable('clangd')
     augroup vim_lsp_cpp
@@ -651,3 +632,5 @@ lua <<EOF
   end
 EOF
 
+set completeopt+=menuone
+set clipboard+=unnamedplus
