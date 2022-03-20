@@ -47,6 +47,7 @@ inoremap <A-Down> <Esc>:m+<CR>
 
 call plug#begin('~/.vim/plugged')
 
+Plug 'davidhalter/jedi-vim'
 Plug 'mattn/emmet-vim'
 Plug 'yamatsum/nvim-cursorline'
 Plug 'rafi/vim-venom', { 'for': 'python' }
