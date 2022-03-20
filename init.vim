@@ -9,7 +9,7 @@ set shiftwidth=4
 set expandtab
 set autoindent
 set smartindent
-set fileformat=unix
+" set fileformat=unix
 set wrap linebreak
 
 "  set noerrorbells
@@ -50,7 +50,7 @@ call plug#begin('~/.vim/plugged')
 Plug 'davidhalter/jedi-vim'
 Plug 'mattn/emmet-vim'
 Plug 'yamatsum/nvim-cursorline'
-Plug 'rafi/vim-venom', { 'for': 'python' }
+" Plug 'rafi/vim-venom', { 'for': 'python' }
 Plug 'dyng/ctrlsf.vim'
 Plug 'Glench/Vim-Jinja2-Syntax'
 Plug 'nvim-lua/plenary.nvim'
@@ -639,7 +639,7 @@ require'nvim-web-devicons'.setup {
 
 -- Use a loop to conveniently call 'setup' on multiple servers and
 -- map buffer local keybindings when the language server attaches
-local servers = { 'pyright', 'rust_analyzer' }
+local servers = { 'rust_analyzer' }
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup {
     on_attach = on_attach,
@@ -766,7 +766,7 @@ xmap        S   <Plug>(vsnip-cut-text)
 let g:vsnip_filetypes = {}
 let g:vsnip_filetypes.javascriptreact = ['javascript']
 let g:vsnip_filetypes.typescriptreact = ['typescript']
-let g:vsnip_filetypes.pythonreact = ['python']
+" let g:vsnip_filetypes.pythonreact = ['python']
 
 au BufWritePost <buffer> lua require('lint').try_lint()
 
