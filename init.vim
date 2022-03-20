@@ -1,4 +1,4 @@
-set mouse=a  " enable mouse
+set mouse=a
 set encoding=utf-8
 set number
 set noswapfile
@@ -32,7 +32,7 @@ set undofile
 " set backspace=indent,eol,start
 " set updatetime=300
 " set cmdheight=1
-" set signcolumn=yes
+set signcolumn=yes
 
 filetype indent on      " load filetype-specific indent files
 
@@ -68,7 +68,8 @@ Plug 'mfussenegger/nvim-lint'
 
 Plug 'norcalli/snippets.nvim'
 
-" Plug 'kyazdani42/nvim-web-devicons'
+Plug 'kyazdani42/nvim-web-devicons'
+Plug 'ryanoasis/vim-devicons' 
 Plug 'romgrk/barbar.nvim'
 
 " Plug 'nvim-lua/lsp_extensions.nvim'
@@ -88,7 +89,6 @@ Plug 'tpope/vim-commentary'
 " Plug 'tpope/vim-surround'
 
 Plug 'hoob3rt/lualine.nvim'
-Plug 'kyazdani42/nvim-web-devicons'
 Plug 'ryanoasis/vim-devicons'
 
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}  " We recommend updating the parsers on update
@@ -120,41 +120,6 @@ Plug 'honza/vim-snippets'
 
 call plug#end()
 
-" Move to previous/next
-nnoremap <silent>    <A-,> :BufferPrevious<CR>
-nnoremap <silent>    <A-.> :BufferNext<CR>
-" Re-order to previous/next
-nnoremap <silent>    <A-S-<> :BufferMovePrevious<CR>
-nnoremap <silent>    <A-S->> :BufferMoveNext<CR>
-" Goto buffer in position...
-nnoremap <silent>    <A-1> :BufferGoto 1<CR>
-nnoremap <silent>    <A-2> :BufferGoto 2<CR>
-nnoremap <silent>    <A-3> :BufferGoto 3<CR>
-nnoremap <silent>    <A-4> :BufferGoto 4<CR>
-nnoremap <silent>    <A-5> :BufferGoto 5<CR>
-nnoremap <silent>    <A-6> :BufferGoto 6<CR>
-nnoremap <silent>    <A-7> :BufferGoto 7<CR>
-nnoremap <silent>    <A-8> :BufferGoto 8<CR>
-nnoremap <silent>    <A-9> :BufferLast<CR>
-" Pin/unpin buffer
-nnoremap <silent>    <A-p> :BufferPin<CR>
-" Close buffer
-nnoremap <silent>    <A-c> :BufferClose<CR>
-" Wipeout buffer
-"                          :BufferWipeout<CR>
-" Close commands
-"                          :BufferCloseAllButCurrent<CR>
-"                          :BufferCloseAllButPinned<CR>
-"                          :BufferCloseBuffersLeft<CR>
-"                          :BufferCloseBuffersRight<CR>
-" Magic buffer-picking mode
-nnoremap <silent> <C-s>    :BufferPick<CR>
-" Sort automatically by...
-nnoremap <silent> <Space>bb :BufferOrderByBufferNumber<CR>
-nnoremap <silent> <Space>bd :BufferOrderByDirectory<CR>
-nnoremap <silent> <Space>bl :BufferOrderByLanguage<CR>
-nnoremap <silent> <Space>bw :BufferOrderByWindowNumber<CR>
-
 " Other:
 " :BarbarEnable - enables barbar (enabled by default)
 " :BarbarDisable - very bad command, should never be used
@@ -170,7 +135,7 @@ let bufferline.add_in_buffer_number_order = v:false
 let bufferline.animation = v:true
 
 " Enable/disable auto-hiding the tab bar when there is a single buffer
-let bufferline.auto_hide = v:false
+let bufferline.auto_hide = v:true
 
 " Enable/disable current/total tabpages indicator (top right corner)
 let bufferline.tabpages = v:true
@@ -184,8 +149,8 @@ let bufferline.closable = v:true
 let bufferline.clickable = v:true
 
 " Excludes buffers from the tabline
-let bufferline.exclude_ft = ['javascript']
-let bufferline.exclude_name = ['package.json']
+" let bufferline.exclude_ft = ['javascript']
+" let bufferline.exclude_name = ['package.json']
 
 " Enable/disable icons
 " if set to 'buffer_number', will show buffer number in the tabline
@@ -259,7 +224,7 @@ set completeopt=menuone,noinsert,noselect
 inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
-nmap     <C-F>f <Plug>CtrlSFPrompt                  
+nmap     <C-F>f <Plug>CtrlSFPrompt
 nmap     <C-F>n <Plug>CtrlSFCwordPath
 nmap     <C-F>p <Plug>CtrlSFPwordPath
 
@@ -354,9 +319,6 @@ nnoremap <leader>n :NvimTreeFindFile<CR>
 " NvimTreeOpen, NvimTreeClose, NvimTreeFocus, NvimTreeFindFileToggle, and NvimTreeResize are also available if you need them
 
 set termguicolors " this variable must be enabled for colors to be applied properly
-
-" a list of groups can be found at `:help nvim_tree_highlight`
-
 
 highlight NvimTreeFolderIcon guibg=grey
 lua << EOF
@@ -512,6 +474,47 @@ imap <C-j> <Plug>(coc-snippets-expand-jump)
 xmap <leader>x  <Plug>(coc-convert-snippet)
 
 lua << EOF
+local map = vim.api.nvim_set_keymap
+local opts = { noremap = true, silent = true }
+
+-- Move to previous/next
+map('n', '<A-,>', ':BufferPrevious<CR>', opts)
+map('n', '<A-.>', ':BufferNext<CR>', opts)
+-- Re-order to previous/next
+map('n', '<A-<>', ':BufferMovePrevious<CR>', opts)
+map('n', '<A->>', ' :BufferMoveNext<CR>', opts)
+-- Goto buffer in position...
+map('n', '<A-1>', ':BufferGoto 1<CR>', opts)
+map('n', '<A-2>', ':BufferGoto 2<CR>', opts)
+map('n', '<A-3>', ':BufferGoto 3<CR>', opts)
+map('n', '<A-4>', ':BufferGoto 4<CR>', opts)
+map('n', '<A-5>', ':BufferGoto 5<CR>', opts)
+map('n', '<A-6>', ':BufferGoto 6<CR>', opts)
+map('n', '<A-7>', ':BufferGoto 7<CR>', opts)
+map('n', '<A-8>', ':BufferGoto 8<CR>', opts)
+map('n', '<A-9>', ':BufferGoto 9<CR>', opts)
+map('n', '<A-0>', ':BufferLast<CR>', opts)
+-- Close buffer
+map('n', '<A-c>', ':BufferClose<CR>', opts)
+-- Wipeout buffer
+--                 :BufferWipeout<CR>
+-- Close commands
+--                 :BufferCloseAllButCurrent<CR>
+--                 :BufferCloseBuffersLeft<CR>
+--                 :BufferCloseBuffersRight<CR>
+-- Magic buffer-picking mode
+map('n', '<C-p>', ':BufferPick<CR>', opts)
+-- Sort automatically by...
+map('n', '<Space>bb', ':BufferOrderByBufferNumber<CR>', opts)
+map('n', '<Space>bd', ':BufferOrderByDirectory<CR>', opts)
+map('n', '<Space>bl', ':BufferOrderByLanguage<CR>', opts)
+
+-- Other:
+-- :BarbarEnable - enables barbar (enabled by default)
+-- :BarbarDisable - very bad command, should never be used
+EOF
+
+lua << EOF
 local nvim_lsp = require('lspconfig')
 
 -- Use an on_attach function to only map the following keys
@@ -598,23 +601,23 @@ nvim_lsp.gopls.setup{
 require'lspconfig'.svelte.setup{}
 
 local lspconfig = require'lspconfig'
-local configs = require'lspconfig/configs'    
+local configs = require'lspconfig/configs'
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
-if not lspconfig.emmet_ls then    
-  configs.emmet_ls = {    
-    default_config = {    
+if not lspconfig.emmet_ls then
+  configs.emmet_ls = {
+    default_config = {
       cmd = {'emmet-ls', '--stdio'};
       filetypes = {'html', 'css', 'blade'};
-      root_dir = function(fname)    
+      root_dir = function(fname)
         return vim.loop.cwd()
-      end;    
-      settings = {};    
-    };    
-  }    
-end    
+      end;
+      settings = {};
+    };
+  }
+end
 
 lspconfig.emmet_ls.setup{ capabilities = capabilities; }
 
@@ -847,6 +850,17 @@ lua <<EOF
         capabilities = capabilities
       }
   end
+    
+    local lspconfig = require'lspconfig'
+    local configs = require'lspconfig/configs'    
+    local capabilities = vim.lsp.protocol.make_client_capabilities()
+    capabilities.textDocument.completion.completionItem.snippetSupport = false
+
+    lspconfig.emmet_ls.setup({
+        -- on_attach = on_attach,
+        capabilities = capabilities,
+        filetypes = {"typescriptreact", "javascript" },
+    })
 EOF
 
 let g:UltiSnipsExpandTrigger="<tab>"
